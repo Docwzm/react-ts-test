@@ -1,0 +1,29 @@
+.bg-image(@url) {
+    background-image: url("../assets/images/@{url}@2x.png");
+    @media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3) {
+        background-image: url("../assets/images/@{url}@3x.png");
+    }
+}
+
+
+.border_all_after(@color: #d9d9d9, @radius: 0) {
+    position: relative;
+  
+    &:after {
+      content: " ";
+      width: 200%;
+      height: 200%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border: 1px solid @color;
+      -webkit-transform: scale(0.5);
+      -ms-transform: scale(0.5);
+      transform: scale(0.5);
+      -webkit-transform-origin: 0 0;
+      -ms-transform-origin: 0 0;
+      transform-origin: 0 0;
+      box-sizing: border-box;
+      border-radius: @radius;
+    }
+  }

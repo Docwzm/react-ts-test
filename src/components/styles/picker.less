@@ -1,0 +1,118 @@
+.pickerview-wrap {
+    .mask {
+        position  : fixed;
+        left      : 0;
+        right     : 0;
+        top       : 0;
+        bottom    : 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index   : 9;
+    }
+}
+
+.picker-wrap {
+    position          : relative;
+    display           : flex;
+    // margin         : 0.3rem auto;
+    align-items       : center;
+    justify-content   : center;
+    margin: 0.1rem 0;
+    .unit{
+        position   : absolute;
+        font-size  : 0.12rem;
+        font-weight: 400;
+        color:rgba(182,182,182,1);
+        margin-top:0.02rem;
+    }
+
+}
+
+.ls-picker-wrap {
+    position         : fixed;
+    bottom           : 0;
+    left             : 0;
+    right            : 0;
+    transform        : translateY(0);
+    animation        : myMove 0.2s linear;
+    text-align       : center;
+    background       : #fff;
+    border-radius    : 0.18rem 0.18rem 0 0;
+    z-index          : 10;
+
+    .top {
+        display        : flex;
+        justify-content: space-between;
+        align-items    : center;
+        padding        : 0.22rem 0.2rem;
+        font-size      : 0.16rem;
+        font-weight    : 400;
+
+
+        p {
+            height     : 0.23rem;
+            color      : rgba(153, 153, 153, 1);
+            line-height: 0.23rem;
+            margin     : 0;
+
+            &:last-child {
+                color: rgba(102, 102, 102, 1);
+            }
+        }
+
+
+        .title {
+            color: rgba(0, 0, 0, 1);
+        }
+    }
+
+}
+
+
+.ls-picker {
+    display: flex;
+    width  : 100%;
+    height : 100%;
+
+    .am-picker-col {
+        height: 100%;
+
+        .am-picker-col-item {
+            // text-align: left;
+            font-size   : 0.22rem;
+            font-weight : 400;
+            color       : rgba(196, 196, 196, 1);
+        }
+
+
+        .am-picker-col-item-selected {
+            font-size  : 0.26rem;
+            font-weight: 400;
+            color      : rgba(0, 0, 0, 1);
+        }
+
+        // &:first-child {
+        //     .am-picker-col-item {
+        //         padding-left: 0;
+        //         text-align   : right;
+        //     }
+        // }
+    }
+
+    .am-picker-col-content {
+        padding: 0;
+    }
+}
+
+
+
+
+
+@keyframes myMove {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
