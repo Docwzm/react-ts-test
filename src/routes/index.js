@@ -1,33 +1,25 @@
 import Layout from '@/views/layout/index'
-import Loadable from 'react-loadable'
-import loading from '@/views/layout/loading'
-
-function _loadable(loader) {
-   return Loadable({
-      loader,
-      loading
-   });
-}
+import {_loadable} from '@/utils'
 
 const routes = [{
    path: "/healthPro",//健康计划
    component: Layout,
    routes: [
       {
-         path: "/healthPro/measure",
-         component: _loadable(() => import('@/views/healthPro/measure'))
+         path: "/healthPro/bp-measure",
+         component: _loadable(() => import('@/views/healthPro/bpMeasure'))
       },
       {
-         path: "/healthPro/foodAndDrink",
-         component: _loadable(() => import('@/views/healthPro/foodAndDrink'))
+         path: "/healthPro/diet",
+         component: _loadable(() => import('@/views/healthPro/diet'))
       },
       {
          path: "/healthPro/course",
          component: _loadable(() => import('@/views/healthPro/course'))
       },
       {
-         path: "/healthPro/reducePress",
-         component: _loadable(() => import('@/views/healthPro/reducePress'))
+         path: "/healthPro/breathing",
+         component: _loadable(() => import('@/views/healthPro/breathing'))
       }
    ]
 }]

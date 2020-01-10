@@ -1,0 +1,153 @@
+.diet-container {
+    padding-bottom: 50px;
+
+    .question-btn {
+        width: 100%;
+        height: 50px;
+        line-height: 50px;
+        background: rgba(111, 109, 253, 1);
+        border: none;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        font-size: 18px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 1);
+    }
+
+    .recomend-food {
+        position: relative;
+        height: 200px;
+        padding: 0 20px;
+        overflow: hidden;
+
+        .detail {
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+
+        .bg {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .tag {
+            height: 16px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 1);
+            line-height: 16px;
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+
+            &::before {
+                content: '';
+                display: block;
+                width: 2px;
+                height: 14px;
+                background: rgba(255, 255, 255, 1);
+                margin-right: 6px;
+            }
+        }
+
+        .name {
+            margin-top: 12px;
+            height: 32px;
+            font-size: 32px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 1);
+            line-height: 32px;
+        }
+
+        .desc {
+            margin-top: 44px;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 1);
+            line-height: 20px;
+            // background:rgba(22,22,30,1);
+        }
+    }
+
+    .recomend-food-list {
+        display: flex;
+        align-items: center;
+
+        padding: 15px 0;
+
+        .tag {
+            // display: inline-block;
+            // vertical-align: middle;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 1);
+            width: 22px;
+            flex:auto;
+            text-align: center;
+            padding: 6px 0;
+            background: rgba(253, 114, 111, 1);
+            border-radius: 0px 6px 6px 0px;
+            margin-right: 10px;
+        }
+
+        .list {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            height:72px;
+            width:343px;
+
+            .food-card {
+                display: inline-block;
+                width: 110px;
+                height: 72px;
+                position: relative;
+                margin-right: 12px;
+            }
+
+            .name {
+                position: absolute;
+                left:0;
+                bottom:0;
+                width:100%;
+                height:24px;
+                line-height: 24px;
+                background:rgba(0,0,0,0.56);
+                font-size:15px;
+                color:rgba(255,255,255,1);
+                text-align: center;
+            }
+
+            img {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+
+    #questions {
+        padding: 20px 15px;
+
+        .question-title {
+            display: flex;
+            align-items: center;
+            height: 16px;
+            font-size: 16px;
+            color: rgba(65, 65, 65, 1);
+            line-height: 16px;
+
+            &::before {
+                content: '';
+                display: block;
+                width: 2px;
+                height: 14px;
+                background: rgba(111, 109, 253, 1);
+                margin-right: 6px;
+            }
+        }
+    }
+
+}

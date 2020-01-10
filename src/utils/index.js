@@ -1,3 +1,7 @@
+
+import Loadable from 'react-loadable'
+import loading from '@/views/layout/loading'
+
 //设置根元素字体
 const setHtmlFonts = () => {
    var deviceWidth = document.documentElement.clientWidth || document.body.clientWidth;
@@ -207,10 +211,10 @@ const filterNum = (val) => {
 function checkEnv() {
    var mHost = window.location.hostname
    return {
-      "cdn.lifesense.com": "online"
+      "cdn.lifesense.com": "online",
+      "doctor.lifesense.com": "online"
    }[mHost] || 'dev'
 }
-
 
 
 function countDown([start, end], cb) {
@@ -225,6 +229,15 @@ function countDown([start, end], cb) {
       }
    }
    timer = setInterval(countDown, 1000);
+}
+
+
+
+function _loadable(loader) {
+   return Loadable({
+      loader,
+      loading
+   });
 }
 
 export {
@@ -247,5 +260,6 @@ export {
    checkPhone,
    filterNum,
    checkEnv,
-   countDown
+   countDown,
+   _loadable
 }

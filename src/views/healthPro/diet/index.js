@@ -1,62 +1,61 @@
 import React from 'react'
 import QuestionCard from '../components/Question.jsx'
-import { upperCaseChars, queryUrlParam } from '@/utils'
-import { getResourceByInstanceId, taskSubmit } from '@/apis/taskplanning_service'
-import { getPagesInfo } from '@/apis/commons_rest'
-import { HEALTHPLAN_RESOURCETYPE } from '@/utils/enum'
-import { JSDOM } from 'jsdom';
-
 import './styles/index.less'
+import { upperCaseChars, queryUrlParam } from '@/utils'
+import { getResourceByInstanceId } from '@/apis/taskplanning_service'
+import { HEALTHPLAN_RESOURCETYPE } from '@/utils/enum'
 
 const _upperCaseChars = upperCaseChars()
 
-export default class Course extends React.Component {
+export default class Diet extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            mainFood: "",
+            foodImg: "",
+            foodDesc: "",
+            recomendFoodList: [],
             questionDone: false,
-            pages: {
-                title: '',
-                content: ''
-            },
             questionList: []
         }
     }
 
-
     componentWillMount() {
         let userId = queryUrlParam(this.props.location.search, 'userId')
-        let courseId = queryUrlParam(this.props.location.search, 'courseId')
-        this.setState({
-            userId,
-            courseId
-        })
+        let dietId = queryUrlParam(this.props.location.search, 'dietId')
         this.getResourceByInstanceId({
             userId,
-            courseId
+            dietId
         })
-        
-        this.getPagesInfo('1266')
     }
 
     componentDidMount() {
-        document.title = '患教'
+        document.title = '饮食'
     }
-
 
     async getResourceByInstanceId({
         userId,
-        courseId
+        dietId
     }) {
 
         let res = await getResourceByInstanceId({
             userId,
-            resourceType: HEALTHPLAN_RESOURCETYPE.COURSE,
-            target: courseId,
+            resourceType: HEALTHPLAN_RESOURCETYPE.DIET,
+            target: dietId,
         })
 
         let { data } = res;
         if (data) {
+            let recomendFoodList = [
+                {
+                    name: data.recommendDealA,
+                    image: data.dealImgA
+                },
+                {
+                    name: data.recommendDealB,
+                    image: data.dealImgB
+                }
+            ]
             let questionList = [
                 {
                     title: data.question,
@@ -76,32 +75,18 @@ export default class Course extends React.Component {
                     ],
                     seletedAnswer: data.seletedAnswer,
                     rightAnswer: data['options4'],
-                    analyze: data.analyze
+                    analyze:data.analyze
                 }
             ]
             this.setState({
+                mainFood: data.mainFood,
+                foodImg: data.foodImg,
+                foodDesc: data.foodDesc,
+                recomendFoodList,
                 questionList
             })
-
-            // this.getPagesInfo('1266')
         }
 
-    }
-
-    async getPagesInfo(id) {
-        let res = await getPagesInfo(id)
-        if (res.data) {
-            let { title, content } = res.data;
-            let html = new JSDOM(content)
-            content = html.window.document.querySelector('.info-content').innerHTML;
-            let pages = {
-                title,
-                content
-            }
-            this.setState({
-                pages
-            })
-        }
     }
 
     scrollToAnchor = (anchorName) => {
@@ -113,16 +98,15 @@ export default class Course extends React.Component {
         }
     }
 
-
     handleSelectQuestion = (questionInd, answer) => {
-        let { userId, planId, taskType, questionList, courseId } = this.state;
+        let { userId, planId, taskType, questionList, dietId } = this.state;
         questionList[questionInd].seletedAnswer = answer
         this.setState({
             questionList: questionList.concat([]),
             questionDone: true
         })
 
-        let _taskSubmit = [{ achieved: courseId }]
+        let _taskSubmit = [{ achieved: dietId }]
         // taskSubmit({
         //     userId,
         //     planId,
@@ -133,14 +117,33 @@ export default class Course extends React.Component {
 
 
     render() {
-        let { pages, questionList, questionDone } = this.state
+        let { pages, questionList, questionDone, mainFood, foodImg, foodDesc, recomendFoodList } = this.state
 
-        return <div className='course-container'>
-            <div className="pages">
-                <p className="title">{pages.title}</p>
-                <div className="content" dangerouslySetInnerHTML={{ __html: pages.content }}></div>
-                <p className="copy"><span>版权声明版权声明版权声明，来源于XXXX，作者XXXX</span></p>
+        return <div className='diet-container'>
+            <div className="top">
+                <div className="recomend-food">
+                    <img className="bg" src={foodImg} />
+                    <div className="detail">
+                        <div className="tag">推荐食材</div>
+                        <p className="name">{mainFood}</p>
+                        <div className="desc">{foodDesc}</div>
+                    </div>
+                </div>
+                <div className="recomend-food-list">
+                    <p className="tag">推荐菜</p>
+                    <div className="list">
+                        {
+                            recomendFoodList.map((item, index) => {
+                                return <div key={index} className="food-card">
+                                    <img src={item.image} />
+                                    <p className="name">{item.name}</p>
+                                </div>
+                            })
+                        }
+                    </div>
+                </div>
             </div>
+
             <div id="questions">
                 <p className="question-title">健康问答</p>
                 <div className="list">

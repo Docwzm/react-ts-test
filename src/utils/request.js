@@ -1,12 +1,9 @@
 import axios from "axios"
 import uuid from 'uuid'
 import {
-    server,
-    getThirdInfo
+    server
 } from '../configs/index'
 import { Toast } from "antd-mobile";
-
-import sha1 from 'sha1';
 
 axios.defaults.withCredentials = true;
 // 创建axios实例
@@ -24,27 +21,12 @@ request.interceptors.request.use(
         if (!config.params) {
             config.params = {}
         }
-        let timestamp = new Date().getTime()
-        let nonce = `${uuid.v1().replace(/-/g, '')}`
-        config.baseURL = server(config.params.isThirdServer, config.params.tenant)
-        let {
-            appId,
-            appSecret,
-            appType
-        } = getThirdInfo(config.params.tenant)
-        delete config.params.isThirdServer
-        delete config.params.tenant
+        config.baseURL = server()
 
         config.params = Object.assign({}, config.params, {
-            appId,
-            timestamp,
-            nonce,
-            checksum: sha1(appId + appSecret + timestamp + nonce),
-            appType,
-            requestId: `${uuid.v1().replace(/-/g, '')}`,
-            accessToken: window.accessToken || localStorage.getItem('accessToken')
+            // appType,
+            requestId: `${uuid.v1().replace(/-/g, '')}`
         })
-        console.log(config)
         return config
     },
     error => {

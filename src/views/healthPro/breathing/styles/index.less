@@ -1,16 +1,14 @@
+@import '../../../../styles/mixin.less';
+
 .breathing {
    position: fixed;
    top: 0;
    bottom: 0;
    left: 0;
    right: 0;
-   //min-height: 100vh;
    background: url(../../../../assets/images/breathing_bg.jpg) bottom no-repeat #354E4D;
    background-size: 100%;
    overflow: hidden;
-   // padding-bottom:64PX;
-   // padding-top:64PX;
-   //box-sizing: content-box;
 
    .page-status {
       .title {
@@ -23,12 +21,17 @@
       .time-wrap {
          display: flex;
          align-items: center;
-         margin-top: .35rem;
          justify-content: center;
-         align-items: flex-end;
+         margin-top: .35rem;
          color: #fff;
-         line-height: 1;
          position: relative;
+         .right-arrow(#B2B2B2,8px 0 0 20px);
+
+         div{
+            display: flex;
+            align-items: flex-end;
+         }
+
          .time {
             font-size: .34rem;
             line-height: .8;
@@ -38,15 +41,7 @@
             font-size: .12rem;
             margin-left: .03rem;
          }
-         img{
-            display: inline-block;
-            width: .15rem;
-            height: .15rem;
-            position: absolute;
-            left: 50%;
-            margin-left: .45rem;
-            margin-top: -0.05rem;
-         }
+
       }
 
       .tips {
@@ -97,7 +92,8 @@
    .page-status-3 {
       width: 100%;
       height: 100%;
-      .btn-group{
+
+      .btn-group {
          width: 2.15rem;
          display: flex;
          justify-content: center;
@@ -133,11 +129,8 @@
                justify-content: center;
                color: #fff;
                margin-top: .21rem;
-
-               .number {
-                  font-size: .4rem;
-                  line-height: 1;
-               }
+               font-size: .4rem;
+               line-height: 1;
 
                .unit {
                   font-size: .15rem;
@@ -202,7 +195,7 @@
                height: 2rem;
                border: .02rem solid #fff;
                border-radius: 50%;
-               animation: shape1 6s  linear infinite;
+               animation: shape1 6s linear infinite;
                position: absolute;
                top: 0;
                left: 0;
@@ -237,26 +230,28 @@
          font-size: .16rem;
          font-weight: bold;
          position: relative;
-         &.hover{
+
+         &.hover {
             border: .075rem solid #EF6D6D;
             border-radius: .5rem;
          }
       }
 
-      .time-run{
+      .time-run {
          font-size: 30px;
          font-weight: 500;
          margin: 1rem auto 0;
          text-align: center;
-         color:#fff;
+         color: #fff;
       }
 
-      .btn-wrap{
+      .btn-wrap {
          text-align: center;
-         margin-top:1.5rem;
+         margin-top: 1.5rem;
       }
 
-      .one-more-time,.exit {
+      .one-more-time,
+      .exit {
          width: 2.04rem;
          height: .5rem;
          text-align: center;
@@ -266,7 +261,7 @@
          font-weight: bold;
          background: #fff;
          border-radius: .25rem;
-         margin:0.1rem auto 0;
+         margin: 0.1rem auto 0;
       }
    }
 
@@ -284,11 +279,12 @@
       transform: scale(.8);
       transform-origin: 50%
    }
+
    8% {
       transform: scale(.8);
       transform-origin: 50%
    }
-   
+
 
    20% {
       transform: scale(0.9);
@@ -319,7 +315,7 @@
       transform: scale(.8);
       transform-origin: 50%
    }
-   
+
 }
 
 @keyframes circle {

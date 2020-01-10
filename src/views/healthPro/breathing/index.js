@@ -36,6 +36,10 @@ class Breathing extends Component {
       document.title = '呼吸训练'
    }
 
+   componentWillUnmount() {
+      clearInterval(this.breathTimer)
+   }
+
    handleStartBreathPractic() {
       let { timeLong, targetTime } = this.state;
       if (timeLong < targetTime * 60) {
@@ -73,28 +77,22 @@ class Breathing extends Component {
          self.setState({ count })
          if (count === countRange[1]) {
             self.setState({ pageStatus: 3 })
-            let targetSec = targetTime * 60;
-            this.runBreath(targetSec)
+            this.runBreath()
          }
       })
    }
 
-   runBreath(targetSec) {
+   runBreath() {
       let { update, timeLong } = this.state
-      countDown([targetSec, 0], (res, timer) => {
+      clearInterval(this.breathTimer)
+      this.breathTimer = setInterval(() => {
          if (this.state.animationState === 'pause') {
-            clearInterval(timer)
+            clearInterval(this.breathTimer)
          } else {
             timeLong++
             this.setState({ timeLong })
          }
-         if (res === 0 && !update) {
-            console.log('倒计时结束');
-
-            this.actionFinishPlanOnce()
-            this.setState({ complate: true, animationState: 'pause' })
-         }
-      })
+      }, 1000)
    }
 
    changeTarget = () => {
@@ -118,7 +116,13 @@ class Breathing extends Component {
    render() {
       const { timeLong, pageStatus, count, animationState, complate, showPicker, targetTime, trainModalVisible, trueDoValue } = this.state;
       let pickerData = [targetTime]
-      const timeLongStr = timeLong < 60 ? (timeLong + '秒') : (timeLong % 60 === 0 ? (timeLong / 60 + '分') : (parseInt(timeLong / 60) + '分' + (timeLong % 60) + '秒'))
+      const timeLongStr = () => {
+         return <>
+            {
+               timeLong < 60 ? <>{timeLong}<span className='unit'>秒</span></> : timeLong % 60 === 0 ? <>{timeLong / 60}<span className="unit">分</span></> : <>{parseInt(timeLong / 60)}<span className="unit">分</span>{timeLong % 60}<span>秒</span></>
+            }
+         </>
+      }
       const timeLongNum = (timeLong < 60 ? '00' : parseInt(timeLong / 60)) + ':' + ((timeLong % 60) < 10 ? ('0' + (timeLong % 60)) : timeLong % 60);
 
       return (
@@ -134,9 +138,10 @@ class Breathing extends Component {
                pageStatus === 1 ? <div className="page-status">
                   <div className='title'>推荐目标</div>
                   <div className='time-wrap' onClick={this.changeTarget}>
-                     <div className='time'>{targetTime}</div>
-                     <div className='unit'>分钟</div>
-                     <img src={require('@/assets/images/icn_right@2x.png')} alt="" />
+                     <div>
+                        <span className='time'>{targetTime}</span>
+                        <span className='unit'>分钟</span>
+                     </div>
                   </div>
                   <div className='tips'>请跟随小气泡的节奏呼吸与吸气</div>
                   <div className='btn' onClick={this.handleStartBtn.bind(this)}>
@@ -159,8 +164,7 @@ class Breathing extends Component {
                         <div className='result'>
                            <div className='result-title'>本次训练</div>
                            <div className='result-center'>
-                              <span className='number'>{(trueDoValue > 0 && trueDoValue < targetTime) ? trueDoValue : targetTime}</span>
-                              <span className='unit'>分钟</span>
+                              {timeLongStr()}
                            </div>
                            <div className='result-info'>{(trueDoValue > 0 && trueDoValue < targetTime) ? trueDoValue * 10 : targetTime * 10}次呼吸</div>
                         </div>
@@ -182,7 +186,6 @@ class Breathing extends Component {
                </div> : null
             }
 
-
             <Modal
                className="train-modal"
                visible={trainModalVisible}
@@ -191,16 +194,18 @@ class Breathing extends Component {
                title={false}
                footer={[{
                   text: '结束', onPress: () => {
-                     this.handleExit()
+                     let trueDoValue = Math.ceil(timeLong / 60)
+                     this.actionFinishPlanOnce()
+                     this.setState({ trainModalVisible: false, complate: true, animationState: 'pause', update: true, trueDoValue })
                   }
                }, {
                   text: '继续', onPress: () => {
                      this.setState({ animationState: 'play', trainModalVisible: false })
-                     this.runBreath(targetTime * 60 - timeLong)
+                     this.runBreath()
                   }
                }]}
             >
-               <div className="title">您练习了{timeLongStr}，未完成目标，再努努力吧！</div>
+               <div className="title">您练习了{timeLongStr()}，未完成目标，再努努力吧！</div>
             </Modal>
          </div>
       )

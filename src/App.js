@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { HashRouter as Router, Route, Redirect } from "react-router-dom";
 import routes from './routes/index';
 import { setHtmlFonts, checkEnv } from "./utils/index"
+import VConsole from 'vconsole'
 
 export default function App() {
   useEffect(() => {
@@ -11,8 +12,9 @@ export default function App() {
     }
 
     //在测试环境开启控制台
-    if (checkEnv() === 'dev') {
-
+    if (checkEnv() !== 'online') {
+      let vConsole = new VConsole();
+      console.log(vConsole)
     }
   }, [])
 

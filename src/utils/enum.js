@@ -1,0 +1,4 @@
+export const HEALTHPLAN_RESOURCETYPE = {
+    DIET:1,
+    COURSE:2
+}

@@ -112,7 +112,7 @@ module.exports = function(webpackEnv) {
             // which in turn let's users customize the target behavior as per their needs.
             postcssNormalize(),
             require('postcss-pxtorem')({
-              rootValue: 200,
+              rootValue: 100,
               propWhiteList: [],
               minPixelValue:2,
             })
@@ -123,12 +123,12 @@ module.exports = function(webpackEnv) {
     ].filter(Boolean);
     if (preProcessor) {
       loaders.push(
-        {
-          loader: require.resolve('resolve-url-loader'),
-          options: {
-            sourceMap: isEnvProduction && shouldUseSourceMap,
-          },
-        },
+        // {
+        //   loader: require.resolve('resolve-url-loader'),
+        //   options: {
+        //     sourceMap: isEnvProduction && shouldUseSourceMap,
+        //   },
+        // },
         {
           loader: require.resolve(preProcessor),
           options: {
