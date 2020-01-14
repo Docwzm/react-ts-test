@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { Modal } from 'antd-mobile'
-import { countDown, gotoPage } from '@/utils'
+import { countDown, gotoPage, queryUrlParam } from '@/utils'
 import Picker from '@/components/Picker'
 import LongTapProgress from '@/components/LongTapProgress'
-
+import { taskSubmit, getUserTaskRecord,updateTaskTargetForPresent } from '@/apis/taskplanning_service'
+import { HEALTHPLANTASKSTATUS } from '@/utils/enum'
 import './styles/index.less'
 
 const timeRangeData = []
@@ -28,16 +29,67 @@ class Breathing extends Component {
          timeLong: 0,
          trainModalVisible: false,
          update: false,
-         trueDoValue: 0
+         trueDoValue: 0,
+         loading: true
       }
    }
 
    componentWillMount() {
       document.title = '呼吸训练'
+      let userId = queryUrlParam(this.props.location.search, 'userId')
+      let planId = queryUrlParam(this.props.location.search, 'planId')
+      let taskId = queryUrlParam(this.props.location.search, 'taskId')
+
+      this.setState({
+         userId,
+         planId,
+         taskId
+      })
+
+      this.getUserTaskRecord({
+         userId,
+         planId,
+         taskId
+      })
    }
 
    componentWillUnmount() {
       clearInterval(this.breathTimer)
+   }
+
+   async getUserTaskRecord({
+      userId,
+      planId,
+      taskId
+   }) {
+      console.log('./.')
+      try {
+         let res = await getUserTaskRecord({
+            userId,
+            planId,
+            taskId
+         })
+         let data = res.data;
+         // if (data && data.status === HEALTHPLANTASKSTATUS.FINISHED) {
+         let timeLong = data.taskAchieve
+         let trueDoValue = Math.ceil(timeLong / 60)
+         console.log(trueDoValue)
+         let targetTime = parseInt(data.taskTarget / 60)
+         this.setState({
+            timeLong,
+            trueDoValue,
+            targetTime,
+            complate: true,
+            animationState: 'pause',
+            pageStatus: 3,
+            loading: false
+         })
+         // }
+      } catch (e) {
+         this.setState({
+            loading: false
+         })
+      }
    }
 
    handleStartBreathPractic() {
@@ -52,7 +104,11 @@ class Breathing extends Component {
    }
 
    handleBreathingOneMoreTime() {
-      window.location.reload()
+      this.setState({
+         targetTime: 1,
+
+         pageStatus: 1,
+      })
    }
 
    handleTimeSave = (val) => {
@@ -76,7 +132,7 @@ class Breathing extends Component {
       countDown(countRange, (count) => {
          self.setState({ count })
          if (count === countRange[1]) {
-            self.setState({ pageStatus: 3 })
+            self.setState({ pageStatus: 3, animationState: 'play', complate: false, timeLong:0 })
             this.runBreath()
          }
       })
@@ -109,12 +165,39 @@ class Breathing extends Component {
     * 完成计划
     * @param {*} data 
     */
-   async actionFinishPlanOnce(data) {
+   async actionFinishPlanOnce() {
+      let {
+         userId,
+         planId,
+         taskId,
+         timeLong,
+         targetTime
+      } = this.state;
 
+      let _taskSubmit = [
+         {
+            taskId,
+            achieved: timeLong,
+         }
+      ]
+
+      await taskSubmit({
+         userId,
+         planId,
+         taskSubmit: _taskSubmit
+      })
+
+      await updateTaskTargetForPresent({
+         userId,
+         planId,
+         taskId,
+         target:targetTime*60
+      })
+      
    }
 
    render() {
-      const { timeLong, pageStatus, count, animationState, complate, showPicker, targetTime, trainModalVisible, trueDoValue } = this.state;
+      const { loading, timeLong, pageStatus, count, animationState, complate, showPicker, targetTime, trainModalVisible, trueDoValue } = this.state;
       let pickerData = [targetTime]
       const timeLongStr = () => {
          return <>
@@ -125,90 +208,88 @@ class Breathing extends Component {
       }
       const timeLongNum = (timeLong < 60 ? '00' : parseInt(timeLong / 60)) + ':' + ((timeLong % 60) < 10 ? ('0' + (timeLong % 60)) : timeLong % 60);
 
-      return (
-         <div className='breathing'>
+      return !loading ? <div className='breathing'>
 
-            {
-               showPicker ? <Picker cancle={this.handleTimeCancle} save={this.handleTimeSave} prefixCls="time-picker" title="时间" data={pickerData} rangedata={timeRangeData}>
-                  <div className="unit" style={{ right: '1.4rem' }}>分钟</div>
-               </Picker> : null
-            }
+         {
+            showPicker ? <Picker cancle={this.handleTimeCancle} save={this.handleTimeSave} prefixCls="time-picker" title="时间" data={pickerData} rangedata={timeRangeData}>
+               <div className="unit" style={{ right: '1.4rem' }}>分钟</div>
+            </Picker> : null
+         }
 
-            {
-               pageStatus === 1 ? <div className="page-status">
-                  <div className='title'>推荐目标</div>
-                  <div className='time-wrap' onClick={this.changeTarget}>
-                     <div>
-                        <span className='time'>{targetTime}</span>
-                        <span className='unit'>分钟</span>
-                     </div>
+         {
+            pageStatus === 1 ? <div className="page-status">
+               <div className='title'>推荐目标</div>
+               <div className='time-wrap' onClick={this.changeTarget}>
+                  <div>
+                     <span className='time'>{targetTime}</span>
+                     <span className='unit'>分钟</span>
                   </div>
-                  <div className='tips'>请跟随小气泡的节奏呼吸与吸气</div>
-                  <div className='btn' onClick={this.handleStartBtn.bind(this)}>
-                     <span>开始</span>
-                  </div>
-               </div> : null
-            }
+               </div>
+               <div className='tips'>请跟随小气泡的节奏呼吸与吸气</div>
+               <div className='btn' onClick={this.handleStartBtn.bind(this)}>
+                  <span>开始</span>
+               </div>
+            </div> : null
+         }
 
-            {
-               pageStatus === 2 ? <div className='page-status-2'>
-                  <div className='count-dowm-num'>{count}</div>
-                  <div className='tips'>请跟随小气泡的节奏呼吸与吸气</div>
-               </div> : null
-            }
+         {
+            pageStatus === 2 ? <div className='page-status-2'>
+               <div className='count-dowm-num'>{count}</div>
+               <div className='tips'>请跟随小气泡的节奏呼吸与吸气</div>
+            </div> : null
+         }
 
-            {
-               pageStatus === 3 ? <div className='page-status-3 '>
-                  <div className='shape'>
-                     {complate ? (
-                        <div className='result'>
-                           <div className='result-title'>本次训练</div>
-                           <div className='result-center'>
-                              {timeLongStr()}
-                           </div>
-                           <div className='result-info'>{(trueDoValue > 0 && trueDoValue < targetTime) ? trueDoValue * 10 : targetTime * 10}次呼吸</div>
+         {
+            pageStatus === 3 ? <div className='page-status-3 '>
+               <div className='shape'>
+                  {complate ? (
+                     <div className='result'>
+                        <div className='result-title'>本次训练</div>
+                        <div className='result-center'>
+                           {timeLongStr()}
                         </div>
-                     ) : (
-                           <div className='words'>
-                              <div className={'words-1 ' + animationState}>吸气</div>
-                              <div className={'words-2 ' + animationState}>呼气</div>
-                           </div>
-                        )}
-                     <div className={'shape-wrap ' + animationState}>
-                        <div className={'shape-1 ' + animationState}></div>
-                        <div className={'shape-2 ' + animationState}></div>
+                        <div className='result-info'>{(trueDoValue > 0 && trueDoValue < targetTime) ? trueDoValue * 10 : targetTime * 10}次呼吸</div>
                      </div>
+                  ) : (
+                        <div className='words'>
+                           <div className={'words-1 ' + animationState}>吸气</div>
+                           <div className={'words-2 ' + animationState}>呼气</div>
+                        </div>
+                     )}
+                  <div className={'shape-wrap ' + animationState}>
+                     <div className={'shape-1 ' + animationState}></div>
+                     <div className={'shape-2 ' + animationState}></div>
                   </div>
-                  {
-                     !complate ? <div className="time-run">{timeLongNum}</div> : null
-                  }
-                  {complate ? <div className="btn-wrap"><div className='one-more-time' onClick={this.handleBreathingOneMoreTime.bind(this)}>再来一次</div><div className='exit' onClick={this.handleExit}>结束</div></div> : <div className='btn-group'><LongTapProgress onComplate={this.handleStartBreathPractic.bind(this)} /></div>}
-               </div> : null
-            }
+               </div>
+               {
+                  !complate ? <div className="time-run">{timeLongNum}</div> : null
+               }
+               {complate ? <div className="btn-wrap"><div className='one-more-time' onClick={this.handleBreathingOneMoreTime.bind(this)}>再来一次</div><div className='exit' onClick={this.handleExit}>结束</div></div> : <div className='btn-group'><LongTapProgress onComplate={this.handleStartBreathPractic.bind(this)} /></div>}
+            </div> : null
+         }
 
-            <Modal
-               className="train-modal"
-               visible={trainModalVisible}
-               transparent
-               maskClosable={false}
-               title={false}
-               footer={[{
-                  text: '结束', onPress: () => {
-                     let trueDoValue = Math.ceil(timeLong / 60)
-                     this.actionFinishPlanOnce()
-                     this.setState({ trainModalVisible: false, complate: true, animationState: 'pause', update: true, trueDoValue })
-                  }
-               }, {
-                  text: '继续', onPress: () => {
-                     this.setState({ animationState: 'play', trainModalVisible: false })
-                     this.runBreath()
-                  }
-               }]}
-            >
-               <div className="title">您练习了{timeLongStr()}，未完成目标，再努努力吧！</div>
-            </Modal>
-         </div>
-      )
+         <Modal
+            className="train-modal"
+            visible={trainModalVisible}
+            transparent
+            maskClosable={false}
+            title={false}
+            footer={[{
+               text: '结束', onPress: () => {
+                  let trueDoValue = Math.ceil(timeLong / 60)
+                  this.actionFinishPlanOnce()
+                  this.setState({ trainModalVisible: false, complate: true, animationState: 'pause', update: true, trueDoValue })
+               }
+            }, {
+               text: '继续', onPress: () => {
+                  this.setState({ animationState: 'play', trainModalVisible: false })
+                  this.runBreath()
+               }
+            }]}
+         >
+            <div className="title">您练习了{timeLongStr()}，未完成目标，再努努力吧！</div>
+         </Modal>
+      </div > : null
    }
 }
 

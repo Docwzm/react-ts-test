@@ -1,11 +1,10 @@
 import React from 'react'
-import { Modal, Icon } from 'antd-mobile'
+import { Modal } from 'antd-mobile'
 import { gotoPage, setLocal, getLocal, queryUrlParam } from '@/utils'
 import { todayBpRecord, taskSubmit } from '@/apis/taskplanning_service'
 import Loading from '@/views/layout/loading'
 import moment from 'moment'
 import './styles/index.less'
-const wx = window.wx
 
 export default class Measure extends React.Component {
 
@@ -273,7 +272,11 @@ export default class Measure extends React.Component {
                 className="bp-measure-modal"
                 visible={measureModal}
                 transparent
-                maskClosable={false}
+                onClose={() => {
+                    this.setState({
+                        measureModal:false
+                    })
+                }}
                 title={false}
                 footer={false}
             >

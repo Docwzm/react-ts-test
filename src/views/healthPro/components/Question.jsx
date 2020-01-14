@@ -18,15 +18,18 @@ export default class QuestionCard extends React.Component {
     }
 
     
-    handleClickQuestion = (text) => {
-        this.props.selectQuestion(text)
+    handleClickQuestion = (key) => {
+        this.props.selectQuestion(key)
     }
 
     render() {
         const { data,questionDone } = this.props
-        let rightAnswerChars = _upperCaseChars[data.answerList.findIndex(item => item.text === data.rightAnswer)]
-        console.log(data)
-        console.log(data.answerList.findIndex(item => item.text === data.rightAnswer))
+        let rightAnswerIndex = data.answerList.findIndex(item => item.key === data.rightAnswer)
+        console.log(data.rightAnswer)
+        console.log(rightAnswerIndex)
+        let rightAnswerChars = _upperCaseChars[rightAnswerIndex]
+        let rightAnswerText = data.answerList[rightAnswerIndex].text
+
         const AnswerContent = (props) => {
             const {
                 ind
@@ -34,17 +37,17 @@ export default class QuestionCard extends React.Component {
             let _item = data.answerList[ind]
 
             if (!questionDone) {
-                return <p onClick={this.handleClickQuestion.bind(this, _item.text)}>
+                return <p onClick={this.handleClickQuestion.bind(this, _item.key)}>
                     <span>{_upperCaseChars[ind]}. {_item.text}</span>
                 </p>
             } else {
-                if (data.rightAnswer === _item.text) {
+                if (data.rightAnswer === _item.key) {
                     return <p className="active">
                         <span>{_upperCaseChars[ind]}. {_item.text}</span>
                         <Icon type="check" color="#6F6DFD"></Icon>
                     </p>
                 } else {
-                    if (data.seletedAnswer !== data.rightAnswer && data.seletedAnswer === _item.text) {
+                    if (data.selectedAnswer !== data.rightAnswer && data.selectedAnswer === _item.key) {
                         return <p className="error">
                             <span>{_upperCaseChars[ind]}. {_item.text}</span>
                             <Icon type="cross" color="#FD726F"></Icon>
@@ -70,7 +73,7 @@ export default class QuestionCard extends React.Component {
             {
                 questionDone ? <>
                     <div className="right-answer">
-                        <p className="tag">正确答案：{rightAnswerChars}. {data.rightAnswer}</p>
+                        <p className="tag">正确答案：{rightAnswerChars}. {rightAnswerText}</p>
                         <p className="desc">{data.analyze}</p>
                     </div>
                     {/* <button className="share-btn">分享给好友</button> */}

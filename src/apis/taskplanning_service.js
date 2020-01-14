@@ -20,13 +20,14 @@ const todayBpRecord = ({ userId, planId }) => {
 /**
  * 获取饮食|患教详情
  */
-const getResourceByInstanceId = ({ userId, resourceType, target }) => {
+const getResourceByInstanceId = ({ userId, planId, taskId, target }) => {
     return request({
         url: `${SERVICE_NAME}/resource/getResourceByInstanceId`,
         method: 'POST',
         data: {
             userId,
-            resourceType,
+            planId,
+            taskId,
             target
         }
     })
@@ -39,7 +40,6 @@ const getResourceByInstanceId = ({ userId, resourceType, target }) => {
 const taskSubmit = ({
     userId,
     planId,
-    taskType,
     taskSubmit
 }) => {
     return request({
@@ -48,14 +48,55 @@ const taskSubmit = ({
         data: {
             userId,
             planId,
-            taskType,
             taskSubmit
         }
     })
 }
 
+/**
+ * 查询用户某个任务的执行记录
+ */
+const getUserTaskRecord = ({
+    userId,
+    planId,
+    taskId
+}) => {
+    return request({
+        url: `${SERVICE_NAME}/plan_task/getUserTaskRecord`,
+        method: 'POST',
+        data: {
+            userId,
+            planId,
+            taskId
+        }
+    })
+}
+
+
+/**
+ * 更新当前任务的目标
+ */
+const updateTaskTargetForPresent = ({
+    userId,
+    planId,
+    taskId,
+    target
+}) => {
+    return request({
+        url: `${SERVICE_NAME}/plan_task/updateTaskTargetForPresent`,
+        method: 'POST',
+        data: {
+            userId,
+            planId,
+            taskId,
+            target
+        }
+    })
+}
 export {
     todayBpRecord,
     getResourceByInstanceId,
-    taskSubmit
+    taskSubmit,
+    getUserTaskRecord,
+    updateTaskTargetForPresent
 }

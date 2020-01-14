@@ -2,7 +2,7 @@ import React from 'react'
 import QuestionCard from '../components/Question.jsx'
 import './styles/index.less'
 import { upperCaseChars, queryUrlParam } from '@/utils'
-import { getResourceByInstanceId } from '@/apis/taskplanning_service'
+import { getResourceByInstanceId, taskSubmit } from '@/apis/taskplanning_service'
 import { HEALTHPLAN_RESOURCETYPE } from '@/utils/enum'
 
 const _upperCaseChars = upperCaseChars()
@@ -23,9 +23,15 @@ export default class Diet extends React.Component {
     componentWillMount() {
         let userId = queryUrlParam(this.props.location.search, 'userId')
         let dietId = queryUrlParam(this.props.location.search, 'dietId')
+        let planId = queryUrlParam(this.props.location.search, 'planId')
+        let taskId = queryUrlParam(this.props.location.search, 'taskId')
+        console.log('..........././.',this.props.location.search)
+        console.log(taskId)
         this.getResourceByInstanceId({
             userId,
-            dietId
+            dietId,
+            planId,
+            taskId
         })
     }
 
@@ -35,17 +41,20 @@ export default class Diet extends React.Component {
 
     async getResourceByInstanceId({
         userId,
-        dietId
+        dietId,
+        planId,
+        taskId
     }) {
 
         let res = await getResourceByInstanceId({
             userId,
-            resourceType: HEALTHPLAN_RESOURCETYPE.DIET,
+            planId,
+            taskId,
             target: dietId,
         })
-
-        let { data } = res;
-        if (data) {
+        let selectedAnswer = res.data?res.data.userSubmit:null
+        if (res.data && res.data.colValMap) {
+            let data = res.data.colValMap
             let recomendFoodList = [
                 {
                     name: data.recommendDealA,
@@ -61,21 +70,25 @@ export default class Diet extends React.Component {
                     title: data.question,
                     answerList: [
                         {
-                            text: data.options1
+                            text: data.options1,
+                            key: 'option1'
                         },
                         {
-                            text: data.options2
+                            text: data.options2,
+                            key: 'option2'
                         },
                         {
-                            text: data.options3
+                            text: data.options3,
+                            key: 'option3'
                         },
                         {
-                            text: data.options4
+                            text: data.options4,
+                            key: 'option4'
                         }
                     ],
-                    seletedAnswer: data.seletedAnswer,
-                    rightAnswer: data['options4'],
-                    analyze:data.analyze
+                    selectedAnswer,
+                    rightAnswer: data.rightanswer,
+                    analyze: data.analyze
                 }
             ]
             this.setState({
@@ -83,7 +96,8 @@ export default class Diet extends React.Component {
                 foodImg: data.foodImg,
                 foodDesc: data.foodDesc,
                 recomendFoodList,
-                questionList
+                questionList,
+                questionDone: selectedAnswer?true:false
             })
         }
 
@@ -98,9 +112,9 @@ export default class Diet extends React.Component {
         }
     }
 
-    handleSelectQuestion = (questionInd, answer) => {
+    handleSelectQuestion = (questionInd, answerKey) => {
         let { userId, planId, taskType, questionList, dietId } = this.state;
-        questionList[questionInd].seletedAnswer = answer
+        questionList[questionInd].seletedAnswer = answerKey
         this.setState({
             questionList: questionList.concat([]),
             questionDone: true
@@ -110,7 +124,6 @@ export default class Diet extends React.Component {
         // taskSubmit({
         //     userId,
         //     planId,
-        //     taskType,
         //     taskSubmit:_taskSubmit
         // })
     }
@@ -149,7 +162,7 @@ export default class Diet extends React.Component {
                 <div className="list">
                     {
                         questionList.map((item, index) => {
-                            return <QuestionCard key={index} selectQuestion={(text) => this.handleSelectQuestion(index, text)} questionDone={questionDone} data={item}></QuestionCard>
+                            return <QuestionCard key={index} selectQuestion={key => this.handleSelectQuestion(index, key)} questionDone={questionDone} data={item}></QuestionCard>
                         })
                     }
                 </div>

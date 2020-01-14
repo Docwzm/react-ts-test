@@ -150,5 +150,5 @@
     "react-router-dom": "^5.1.2"
   },
   "homepage": "/mls",
-  "proxy": "https://sports.lifesense.com"
+  "proxy": "https://sports-qa.lifesense.com"
 }

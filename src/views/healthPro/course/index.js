@@ -27,16 +27,25 @@ export default class Course extends React.Component {
     componentWillMount() {
         let userId = queryUrlParam(this.props.location.search, 'userId')
         let courseId = queryUrlParam(this.props.location.search, 'courseId')
+        let articleId = queryUrlParam(this.props.location.search, 'articleId')
+        let planId = queryUrlParam(this.props.location.search, 'planId')
+        let taskId = queryUrlParam(this.props.location.search, 'taskId')
+        console.log(this.props.location.search)
         this.setState({
             userId,
-            courseId
+            courseId,
+            articleId,
+            planId,
+            taskId
         })
         this.getResourceByInstanceId({
             userId,
-            courseId
+            courseId,
+            planId,
+            taskId
         })
-        
-        this.getPagesInfo('1266')
+
+        this.getPagesInfo(articleId)
     }
 
     componentDidMount() {
@@ -46,44 +55,51 @@ export default class Course extends React.Component {
 
     async getResourceByInstanceId({
         userId,
-        courseId
+        courseId,
+        planId,
+        taskId
     }) {
-
         let res = await getResourceByInstanceId({
             userId,
-            resourceType: HEALTHPLAN_RESOURCETYPE.COURSE,
             target: courseId,
+            planId,
+            taskId
         })
 
-        let { data } = res;
-        if (data) {
+        let selectedAnswer = res.data ? res.data.userSubmit : null
+        if (res.data && res.data.colValMap) {
+            let data = res.data.colValMap
             let questionList = [
                 {
                     title: data.question,
                     answerList: [
                         {
-                            text: data.options1
+                            text: data.option1,
+                            key: 'option1'
                         },
                         {
-                            text: data.options2
+                            text: data.option2,
+                            key: 'option2'
                         },
                         {
-                            text: data.options3
+                            text: data.option3,
+                            key: 'option3'
                         },
                         {
-                            text: data.options4
+                            text: data.option4,
+                            key: 'option4'
                         }
                     ],
-                    seletedAnswer: data.seletedAnswer,
-                    rightAnswer: data['options4'],
+                    selectedAnswer,
+                    rightAnswer: data.rightanswer,
                     analyze: data.analyze
                 }
             ]
             this.setState({
-                questionList
+                questionList,
+                questionDone: selectedAnswer ? true : false
             })
 
-            // this.getPagesInfo('1266')
         }
 
     }
@@ -91,16 +107,20 @@ export default class Course extends React.Component {
     async getPagesInfo(id) {
         let res = await getPagesInfo(id)
         if (res.data) {
-            let { title, content } = res.data;
-            let html = new JSDOM(content)
-            content = html.window.document.querySelector('.info-content').innerHTML;
-            let pages = {
-                title,
-                content
+            try {
+                let { title, content } = res.data;
+                let html = new JSDOM(content)
+                content = html.window.document.querySelector('.info-content').innerHTML;
+                let pages = {
+                    title,
+                    content
+                }
+                this.setState({
+                    pages
+                })
+            } catch (e) {
+
             }
-            this.setState({
-                pages
-            })
         }
     }
 
@@ -114,21 +134,19 @@ export default class Course extends React.Component {
     }
 
 
-    handleSelectQuestion = (questionInd, answer) => {
-        let { userId, planId, taskType, questionList, courseId } = this.state;
-        questionList[questionInd].seletedAnswer = answer
+    handleSelectQuestion = (questionInd, answerKey) => {
+        let { userId, planId, taskId, questionList, courseId } = this.state;
+        questionList[questionInd].seletedAnswer = answerKey
         this.setState({
             questionList: questionList.concat([]),
             questionDone: true
         })
-
-        let _taskSubmit = [{ achieved: courseId }]
-        // taskSubmit({
-        //     userId,
-        //     planId,
-        //     taskType,
-        //     taskSubmit:_taskSubmit
-        // })
+        let _taskSubmit = [{ taskId, achieved: courseId, addition: answerKey }]
+        taskSubmit({
+            userId,
+            planId,
+            taskSubmit: _taskSubmit
+        })
     }
 
 
@@ -146,7 +164,7 @@ export default class Course extends React.Component {
                 <div className="list">
                     {
                         questionList.map((item, index) => {
-                            return <QuestionCard key={index} selectQuestion={(text) => this.handleSelectQuestion(index, text)} questionDone={questionDone} data={item}></QuestionCard>
+                            return <QuestionCard key={index} selectQuestion={key => this.handleSelectQuestion(index, key)} questionDone={questionDone} data={item}></QuestionCard>
                         })
                     }
                 </div>
