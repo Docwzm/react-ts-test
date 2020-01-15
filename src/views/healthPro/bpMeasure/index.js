@@ -249,6 +249,7 @@ export default class Measure extends React.Component {
         let { measureWayModal, measureModal, measureStep, measureStatus, time, morningBpRecord, nightBpRecord, hintCheck } = this.state
 
         return <div className="bp-measure-container">
+            
             <Modal
                 className="measure-way-modal"
                 visible={measureWayModal}

@@ -213,6 +213,8 @@ class Breathing extends Component {
 
       return !loading ? <div className='breathing'>
 
+         {/* <img className="bg" src={require('@/assets/images/breathing_bg.jpg')}></img> */}
+
          {
             showPicker ? <Picker cancle={this.handleTimeCancle} save={this.handleTimeSave} prefixCls="time-picker" title="时间" data={pickerData} rangedata={timeRangeData}>
                <div className="unit" style={{ right: '1.4rem' }}>分钟</div>

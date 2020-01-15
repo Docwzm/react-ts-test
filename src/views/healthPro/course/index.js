@@ -17,8 +17,8 @@ export default class Course extends React.Component {
             questionDone: false,
             pages: {
                 title: '',
-                author: 'XXXX',
-                origin: 'XXXX',
+                // author: 'XXXX',
+                // origin: 'XXXX',
                 content: ''
             },
             questionList: []
@@ -116,8 +116,8 @@ export default class Course extends React.Component {
                 let pages = {
                     title,
                     content,
-                    author,
-                    origin
+                    // author,
+                    // origin
                 }
                 this.setState({
                     pages
@@ -161,7 +161,7 @@ export default class Course extends React.Component {
             <div className="pages">
                 <p className="title">{pages.title}</p>
                 <div className="content" dangerouslySetInnerHTML={{ __html: pages.content }}></div>
-                <p className="copy"><span>版权声明版权声明版权声明，来源于{pages.origin}，作者{pages.author}</span></p>
+                {/* <p className="copy"><span>版权声明版权声明版权声明，来源于{pages.origin}，作者{pages.author}</span></p> */}
             </div>
             <div id="questions">
                 <p className="question-title">健康问答</p>
