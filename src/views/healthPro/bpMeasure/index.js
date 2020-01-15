@@ -16,7 +16,7 @@ export default class Measure extends React.Component {
             measureModal: false,//测量引导弹窗标识
             measureStep: 0, //测量引导状态0-未开始 1-进行中
             measureStatus: 0,//测量的进度 0-进行中 1-完成
-            time: 5, //测量引导时间倒计时
+            time: 60, //测量引导时间倒计时
             morningBpRecord: {
                 name: '晨起血压测量',
                 recomendTime: '6:00-10:00',
@@ -42,6 +42,9 @@ export default class Measure extends React.Component {
 
         let userId = queryUrlParam(this.props.location.search, 'userId')
         let planId = queryUrlParam(this.props.location.search, 'planId')
+        let taskIds = queryUrlParam(this.props.location.search, 'taskId')
+        console.log()
+
         this.setState({
             userId,
             planId
@@ -75,12 +78,11 @@ export default class Measure extends React.Component {
                 let {
                     morningBpRecord = {},
                     nightBpRecord = {},
-                    taskType
                 } = data
+                morningBpRecord.measurementDate = moment(morningBpRecord.measurementDate).format('YYYY-MM-DD HH:mm')
                 this.setState({
                     morningBpRecord: { ...this.state.morningBpRecord, ...morningBpRecord },
                     nightBpRecord: { ...this.state.nightBpRecord, ...nightBpRecord },
-                    taskType
                 })
                 callback && callback(data)
             }
@@ -101,10 +103,10 @@ export default class Measure extends React.Component {
         if (hintCheck) {
             //之前操作过下次不再提示  直接跳到第二步
             this.setState({
-                measureWayModal:false,
+                measureWayModal: false,
                 measureModal: true,
                 measureStep: 1,
-                time: 5,
+                time: 60,
                 measureStatus: 0,
             }, () => {
                 this.timeRun()
@@ -112,7 +114,7 @@ export default class Measure extends React.Component {
 
         } else {
             this.setState({
-                measureWayModal:false,
+                measureWayModal: false,
                 measureModal: true
             })
         }
@@ -126,13 +128,11 @@ export default class Measure extends React.Component {
         }
         this.setState({
             measureStep: 1,
-            time: 5,
+            time: 60,
             measureStatus: 0
         }, () => {
             this.timeRun()
         })
-
-
     }
 
 
@@ -188,7 +188,7 @@ export default class Measure extends React.Component {
                     nightBpRecord
                 })
             }
-            this.submitTask(data)
+            // this.submitTask(data)
         })
     }
 
@@ -255,7 +255,7 @@ export default class Measure extends React.Component {
                 transparent
                 onClose={() => {
                     this.setState({
-                        measureWayModal:false
+                        measureWayModal: false
                     })
                 }}
                 title={false}
@@ -272,11 +272,11 @@ export default class Measure extends React.Component {
                 className="bp-measure-modal"
                 visible={measureModal}
                 transparent
-                onClose={() => {
-                    this.setState({
-                        measureModal:false
-                    })
-                }}
+                // onClose={() => {
+                //     this.setState({
+                //         measureModal: false
+                //     })
+                // }}
                 title={false}
                 footer={false}
             >
@@ -335,7 +335,7 @@ export default class Measure extends React.Component {
                                 <div className="info">
                                     <p className="bp">{item.systolicPressure}/{item.diastolicPressure}<span className="unit">mmHG</span></p>
                                     <p className="heart">{item.heartRate}<span className="unit">mbp</span></p>
-                                    <p className="status danger">{item.levelName}</p>
+                                    <p className={'status' + (item.level != 2 && item.level != 3 ? ' abnormal' : '')}>{item.levelName}</p>
                                 </div>
                             </> : null
                         }

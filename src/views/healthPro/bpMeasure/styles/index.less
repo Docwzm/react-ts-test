@@ -123,11 +123,13 @@
                 height: 22px;
                 font-size: 16px;
                 font-weight: 600;
-                color: rgba(253, 94, 69, 1);
+                color: rgba(111, 109, 253, 1);
                 line-height: 22px;
                 padding: 0 15px;
+                .border_all_after(rgba(111, 109, 253, 1), 26px);
 
-                &.danger {
+                &.abnormal {
+                    color: rgba(253, 94, 69, 1);
                     .border_all_after(#FD694E, 26px)
                 }
             }
@@ -143,12 +145,15 @@
     height: 259px;
     background: rgba(255, 255, 255, 1);
     border-radius: 26px;
-   overflow: hidden;
-.am-modal-content{
-    padding-top:0;
-}
+    overflow: hidden;
+
+    .am-modal-content {
+        padding-top: 0;
+    }
+
     .content-wrap {
-        padding-top:63px;
+        padding-top: 63px;
+
         p {
             width: 223px;
             height: 50px;
@@ -159,7 +164,7 @@
             font-weight: 600;
             color: rgba(255, 255, 255, 1);
             text-align: center;
-            margin:0 auto 30px;
+            margin: 0 auto 30px;
 
             &:last-of-type {
                 margin-bottom: 0;
@@ -173,7 +178,7 @@
             font-size: 16px;
             color: rgba(159, 160, 159, 1);
             line-height: 22px;
-            margin-top:4px;
+            margin-top: 4px;
         }
     }
 }
@@ -205,6 +210,10 @@
             height: 205px;
             display: block;
             margin: 34px auto 41px;
+            background:url('../../../../assets/images/bp_measure_guide.png') no-repeat;
+            background-size:100% 100%;
+            border-radius: 50%;
+            overflow: hidden;
         }
 
         .guide-list {
@@ -242,11 +251,11 @@
                 .border_all_after(#979797, 4px);
             }
 
-            b{
+            b {
                 position: absolute;
-                left:50%;
-                top:50%;
-                transform: translate(-50%,-50%);
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
             }
 
         }

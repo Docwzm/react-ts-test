@@ -17,6 +17,8 @@ export default class Course extends React.Component {
             questionDone: false,
             pages: {
                 title: '',
+                author: 'XXXX',
+                origin: 'XXXX',
                 content: ''
             },
             questionList: []
@@ -108,12 +110,14 @@ export default class Course extends React.Component {
         let res = await getPagesInfo(id)
         if (res.data) {
             try {
-                let { title, content } = res.data;
+                let { title, content, author, origin } = res.data;
                 let html = new JSDOM(content)
                 content = html.window.document.querySelector('.info-content').innerHTML;
                 let pages = {
                     title,
-                    content
+                    content,
+                    author,
+                    origin
                 }
                 this.setState({
                     pages
@@ -136,7 +140,7 @@ export default class Course extends React.Component {
 
     handleSelectQuestion = (questionInd, answerKey) => {
         let { userId, planId, taskId, questionList, courseId } = this.state;
-        questionList[questionInd].seletedAnswer = answerKey
+        questionList[questionInd].selectedAnswer = answerKey
         this.setState({
             questionList: questionList.concat([]),
             questionDone: true
@@ -157,7 +161,7 @@ export default class Course extends React.Component {
             <div className="pages">
                 <p className="title">{pages.title}</p>
                 <div className="content" dangerouslySetInnerHTML={{ __html: pages.content }}></div>
-                <p className="copy"><span>版权声明版权声明版权声明，来源于XXXX，作者XXXX</span></p>
+                <p className="copy"><span>版权声明版权声明版权声明，来源于{pages.origin}，作者{pages.author}</span></p>
             </div>
             <div id="questions">
                 <p className="question-title">健康问答</p>

@@ -25,8 +25,12 @@ export default class Diet extends React.Component {
         let dietId = queryUrlParam(this.props.location.search, 'dietId')
         let planId = queryUrlParam(this.props.location.search, 'planId')
         let taskId = queryUrlParam(this.props.location.search, 'taskId')
-        console.log('..........././.',this.props.location.search)
-        console.log(taskId)
+        this.setState({
+            userId,
+            dietId,
+            planId,
+            taskId
+        })
         this.getResourceByInstanceId({
             userId,
             dietId,
@@ -52,7 +56,7 @@ export default class Diet extends React.Component {
             taskId,
             target: dietId,
         })
-        let selectedAnswer = res.data?res.data.userSubmit:null
+        let selectedAnswer = res.data ? res.data.userSubmit : null
         if (res.data && res.data.colValMap) {
             let data = res.data.colValMap
             let recomendFoodList = [
@@ -71,19 +75,19 @@ export default class Diet extends React.Component {
                     answerList: [
                         {
                             text: data.options1,
-                            key: 'option1'
+                            key: 'options1'
                         },
                         {
                             text: data.options2,
-                            key: 'option2'
+                            key: 'options2'
                         },
                         {
                             text: data.options3,
-                            key: 'option3'
+                            key: 'options3'
                         },
                         {
                             text: data.options4,
-                            key: 'option4'
+                            key: 'options4'
                         }
                     ],
                     selectedAnswer,
@@ -97,7 +101,7 @@ export default class Diet extends React.Component {
                 foodDesc: data.foodDesc,
                 recomendFoodList,
                 questionList,
-                questionDone: selectedAnswer?true:false
+                questionDone: selectedAnswer ? true : false
             })
         }
 
@@ -113,19 +117,19 @@ export default class Diet extends React.Component {
     }
 
     handleSelectQuestion = (questionInd, answerKey) => {
-        let { userId, planId, taskType, questionList, dietId } = this.state;
-        questionList[questionInd].seletedAnswer = answerKey
+        let { userId, planId, questionList, dietId, taskId } = this.state;
+        questionList[questionInd].selectedAnswer = answerKey
         this.setState({
             questionList: questionList.concat([]),
             questionDone: true
         })
 
-        let _taskSubmit = [{ achieved: dietId }]
-        // taskSubmit({
-        //     userId,
-        //     planId,
-        //     taskSubmit:_taskSubmit
-        // })
+        let _taskSubmit = [{ taskId, achieved: dietId, addition: answerKey }]
+        taskSubmit({
+            userId,
+            planId,
+            taskSubmit: _taskSubmit
+        })
     }
 
 

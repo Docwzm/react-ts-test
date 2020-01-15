@@ -3,7 +3,7 @@ import { Modal } from 'antd-mobile'
 import { countDown, gotoPage, queryUrlParam } from '@/utils'
 import Picker from '@/components/Picker'
 import LongTapProgress from '@/components/LongTapProgress'
-import { taskSubmit, getUserTaskRecord,updateTaskTargetForPresent } from '@/apis/taskplanning_service'
+import { taskSubmit, getUserTaskRecord, updateTaskTargetForPresent } from '@/apis/taskplanning_service'
 import { HEALTHPLANTASKSTATUS } from '@/utils/enum'
 import './styles/index.less'
 
@@ -25,7 +25,7 @@ class Breathing extends Component {
          animationState: 'play',
          complate: false,
          showPicker: false,
-         targetTime: 1,
+         targetTime: 2,//单位分钟
          timeLong: 0,
          trainModalVisible: false,
          update: false,
@@ -70,21 +70,24 @@ class Breathing extends Component {
             taskId
          })
          let data = res.data;
-         // if (data && data.status === HEALTHPLANTASKSTATUS.FINISHED) {
-         let timeLong = data.taskAchieve
-         let trueDoValue = Math.ceil(timeLong / 60)
-         console.log(trueDoValue)
-         let targetTime = parseInt(data.taskTarget / 60)
-         this.setState({
-            timeLong,
-            trueDoValue,
-            targetTime,
-            complate: true,
-            animationState: 'pause',
-            pageStatus: 3,
-            loading: false
-         })
-         // }
+         if (data && data.taskAchieve) {
+            let timeLong = data.taskAchieve
+            let trueDoValue = Math.ceil(timeLong / 60)
+            let targetTime = parseInt(data.taskTarget / 60)
+            this.setState({
+               timeLong,
+               trueDoValue,
+               targetTime,
+               complate: true,
+               animationState: 'pause',
+               pageStatus: 3,
+               loading: false
+            })
+         } else {
+            this.setState({
+               loading: false
+            })
+         }
       } catch (e) {
          this.setState({
             loading: false
@@ -132,7 +135,7 @@ class Breathing extends Component {
       countDown(countRange, (count) => {
          self.setState({ count })
          if (count === countRange[1]) {
-            self.setState({ pageStatus: 3, animationState: 'play', complate: false, timeLong:0 })
+            self.setState({ pageStatus: 3, animationState: 'play', complate: false, timeLong: 0 })
             this.runBreath()
          }
       })
@@ -191,9 +194,9 @@ class Breathing extends Component {
          userId,
          planId,
          taskId,
-         target:targetTime*60
+         target: targetTime * 60
       })
-      
+
    }
 
    render() {
@@ -264,7 +267,7 @@ class Breathing extends Component {
                {
                   !complate ? <div className="time-run">{timeLongNum}</div> : null
                }
-               {complate ? <div className="btn-wrap"><div className='one-more-time' onClick={this.handleBreathingOneMoreTime.bind(this)}>再来一次</div><div className='exit' onClick={this.handleExit}>结束</div></div> : <div className='btn-group'><LongTapProgress onComplate={this.handleStartBreathPractic.bind(this)} /></div>}
+               {complate ? null : <div className='btn-group'><LongTapProgress onComplate={this.handleStartBreathPractic.bind(this)} /></div>}
             </div> : null
          }
 

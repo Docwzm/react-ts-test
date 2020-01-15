@@ -25,6 +25,7 @@ export default class QuestionCard extends React.Component {
     render() {
         const { data,questionDone } = this.props
         let rightAnswerIndex = data.answerList.findIndex(item => item.key === data.rightAnswer)
+        console.log(data.answerList)
         console.log(data.rightAnswer)
         console.log(rightAnswerIndex)
         let rightAnswerChars = _upperCaseChars[rightAnswerIndex]
