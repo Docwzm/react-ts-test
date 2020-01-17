@@ -79,7 +79,7 @@ export default class Measure extends React.Component {
                     morningBpRecord = {},
                     nightBpRecord = {},
                 } = data
-                morningBpRecord.measurementDate = moment(morningBpRecord.measurementDate).format('YYYY-MM-DD HH:mm')
+                morningBpRecord.measurementDate = moment(morningBpRecord.measurementDate).format('YYYY.MM.DD HH:mm')
                 this.setState({
                     morningBpRecord: { ...this.state.morningBpRecord, ...morningBpRecord },
                     nightBpRecord: { ...this.state.nightBpRecord, ...nightBpRecord },
@@ -238,7 +238,7 @@ export default class Measure extends React.Component {
             planId,
             taskType
         } = this.state
-        gotoPage(`/pages/home/bloodpressure/edit/index?returnPath=pages/webview/index&planId=${planId}&taskType=${taskType}`)
+        gotoPage(`/pages/home/bloodpressure/edit/index?returnPath=pages/webview/index`)
     }
 
     handleCheckHistory = () => {
@@ -249,7 +249,7 @@ export default class Measure extends React.Component {
         let { measureWayModal, measureModal, measureStep, measureStatus, time, morningBpRecord, nightBpRecord, hintCheck } = this.state
 
         return <div className="bp-measure-container">
-            
+
             <Modal
                 className="measure-way-modal"
                 visible={measureWayModal}
@@ -311,38 +311,44 @@ export default class Measure extends React.Component {
 
             {
                 [morningBpRecord, nightBpRecord].map((item, index) => {
-                    return <div key={index} className="card">
+                    return <div key={index} className={'card ' + (index ? 'night' : 'morning')}>
                         <p className="title">{item.name}</p>
                         {
-                            !(item.systolicPressure && item.diastolicPressure) ? <>
+                            !(item.systolicPressure && item.diastolicPressure) || item.status === 4 ? <>
                                 <p className="recomend-time">推荐测量时间：{item.recomendTime}</p>
 
                             </> : null
                         }
 
                         {
-                            !(item.systolicPressure && item.diastolicPressure) && !item.checkNone ? <>
-                                <div className={'icon ' + (index === 0 ? 'day' : 'night')}></div>
-                            </> : null
+                            item.status === 4 ? <div className="info-out-time">今日晨测错过啦，请明日再来</div> : <>
+                                {
+                                    !(item.systolicPressure && item.diastolicPressure) && !item.checkNone ? <>
+                                        <div className={'icon ' + (index === 0 ? 'day' : 'night')}></div>
+                                    </> : null
+                                }
+
+                                {
+                                    (!(item.systolicPressure && item.diastolicPressure)) && item.checkNone ? <div className="info-none">未获取到您的血压数据 <span onClick={this.handleHandInput}>手动输入</span></div> : null
+                                }
+
+                                {
+                                    item.systolicPressure && item.diastolicPressure ? <>
+                                        <p className="measure-time">{item.measurementDate}</p>
+                                        <div className="info">
+                                            <p className="bp">{item.systolicPressure}/{item.diastolicPressure}<span className="unit">mmHg</span></p>
+                                            <p className="heart"><span className="heart-icon"></span>{item.heartRate}<span className="unit">mbp</span></p>
+                                            <p className={'status' + (item.level != 2 && item.level != 3 ? ' abnormal' : '')}>{item.levelName}</p>
+                                        </div>
+                                    </> : null
+                                }
+                            </>
                         }
 
-                        {
-                            (!(item.systolicPressure && item.diastolicPressure)) && item.checkNone ? <div className="info-none">未获取到您的血压数据 <span onClick={this.handleHandInput}>手动输入</span></div> : null
-                        }
+
 
                         {
-                            item.systolicPressure && item.diastolicPressure ? <>
-                                <p className="measure-time">{item.measurementDate}</p>
-                                <div className="info">
-                                    <p className="bp">{item.systolicPressure}/{item.diastolicPressure}<span className="unit">mmHG</span></p>
-                                    <p className="heart">{item.heartRate}<span className="unit">mbp</span></p>
-                                    <p className={'status' + (item.level != 2 && item.level != 3 ? ' abnormal' : '')}>{item.levelName}</p>
-                                </div>
-                            </> : null
-                        }
-
-                        {
-                            !(item.systolicPressure && item.diastolicPressure) ? <button className="measure-btn" onClick={this.handleOpenMeasureWay.bind(this, index)}>去测量</button> : null
+                            !(item.systolicPressure && item.diastolicPressure) || item.status === 4 ? <button className="measure-btn" onClick={this.handleOpenMeasureWay.bind(this, index)}>去测量</button> : null
                         }
                         <p className="check-history" onClick={this.handleCheckHistory}>查看近期血压数据&gt;&gt;</p>
                     </div>

@@ -16,6 +16,12 @@
         margin: 0 auto 15px;
         text-align: center;
 
+        &.night{
+            .measure-btn{
+                background:#5855F7;
+            }
+        }
+
         .title {
             height: 25px;
             font-size: 18px;
@@ -75,6 +81,14 @@
             line-height: 22px;
         }
 
+        .info-out-time{
+            height: 22px;
+            font-size: 16px;
+            color: #6462EE;
+            line-height: 22px;
+            margin: 37px 0 32px;
+        }
+
         .info-none {
             height: 22px;
             font-size: 16px;
@@ -96,6 +110,7 @@
                 font-size: 15px;
                 color: rgba(159, 160, 159, 1);
                 line-height: 21px;
+                margin-left:4px;
             }
 
             .bp {
@@ -113,6 +128,16 @@
                 color: rgba(65, 65, 65, 1);
                 line-height: 22px;
                 margin-top: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+               .heart-icon{
+                   width:12px;
+                   height:12px;
+                   .bg-image('heart_icon');
+                   background-size:100% 100%;
+                   margin-right: 5px;
+               }
             }
 
             .status {
