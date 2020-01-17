@@ -7,7 +7,6 @@ import moment from 'moment'
 import './styles/index.less'
 
 export default class Measure extends React.Component {
-
     constructor(props) {
         super(props)
         this.state = {
