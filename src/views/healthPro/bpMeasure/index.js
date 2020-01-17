@@ -17,7 +17,7 @@ export default class Measure extends React.Component {
             measureModal: false,//测量引导弹窗标识
             measureStep: 0, //测量引导状态0-未开始 1-进行中
             measureStatus: 0,//测量的进度 0-进行中 1-完成
-            time: 4, //测量引导时间倒计时
+            time: 60, //测量引导时间倒计时
             morningBpRecord: {
                 name: '晨起血压测量',
                 recomendTime: '6:00-10:00'
@@ -146,7 +146,7 @@ export default class Measure extends React.Component {
                 measureWayModal: false,
                 measureModal: true,
                 measureStep: 1,
-                time: 4,
+                time: 60,
                 measureStatus: 0,
             }, () => {
                 this.timeRun()
@@ -168,7 +168,7 @@ export default class Measure extends React.Component {
         }
         this.setState({
             measureStep: 1,
-            time: 4,
+            time: 60,
             measureStatus: 0
         }, () => {
             this.timeRun()
