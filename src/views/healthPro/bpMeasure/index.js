@@ -16,40 +16,28 @@ export default class Measure extends React.Component {
             measureModal: false,//测量引导弹窗标识
             measureStep: 0, //测量引导状态0-未开始 1-进行中
             measureStatus: 0,//测量的进度 0-进行中 1-完成
-            time: 60, //测量引导时间倒计时
+            time: 4, //测量引导时间倒计时
             morningBpRecord: {
                 name: '晨起血压测量',
-                recomendTime: '6:00-10:00',
-                // "measurementDate": moment().format('YYYY-MM-DD HH:mm'),//测量时间
-                // "systolicPressure": 120,//高
-                // "diastolicPressure": 80,//低
-                // "heartRate": 76,//心率
-                // "levelName": "h1高血压"
+                recomendTime: '6:00-10:00'
             },
             nightBpRecord: {
                 name: '睡前血压测量',
-                recomendTime: '20:00-24:00',
-                // "measurementDate": moment().format('YYYY-MM-DD HH:mm'),
-                // "systolicPressure": 120,
-                // "diastolicPressure": 80,
-                // "heartRate": 76,
-                // "levelName": "正常"
+                recomendTime: '20:00-24:00'
             }
         }
     }
 
     componentWillMount() {
-
         let userId = queryUrlParam(this.props.location.search, 'userId')
         let planId = queryUrlParam(this.props.location.search, 'planId')
-        let taskIds = queryUrlParam(this.props.location.search, 'taskId')
-        console.log()
 
         this.setState({
             userId,
             planId
         })
-        this.getTodayBpRecord({
+
+        this.runBpTimer({
             userId,
             planId
         })
@@ -59,8 +47,26 @@ export default class Measure extends React.Component {
         document.title = '测量'
     }
 
+
     componentWillUnmount() {
         clearInterval(this.timer)
+        clearInterval(this.bpTimer)
+    }
+
+    runBpTimer({ userId, planId }) {
+        //首次触发
+        this.getTodayBpRecord({
+            userId,
+            planId
+        })
+
+        clearInterval(this.bpTimer);
+        this.bpTimer = setInterval(() => {
+            this.getTodayBpRecord({
+                userId,
+                planId
+            })
+        }, 3000)
     }
 
 
@@ -76,12 +82,37 @@ export default class Measure extends React.Component {
             let data = res.data
             if (data) {
                 let {
-                    morningBpRecord = {},
-                    nightBpRecord = {},
+                    morningBpRecord = {
+                    },
+                    nightBpRecord = {
+                    },
                 } = data
                 morningBpRecord.measurementDate = moment(morningBpRecord.measurementDate).format('YYYY.MM.DD HH:mm')
+                if (morningBpRecord.systolicPressure && morningBpRecord.diastolicPressure) {
+                    morningBpRecord = { ...this.state.morningBpRecord, ...morningBpRecord }
+                } else {
+                    morningBpRecord = {
+                        ...{
+                            name: '晨起血压测量',
+                            recomendTime: '6:00-10:00'
+                        },
+                        ...morningBpRecord
+                    }
+                }
+
+                if (nightBpRecord.systolicPressure && nightBpRecord.diastolicPressure) {
+                    nightBpRecord = { ...this.state.nightBpRecord, ...nightBpRecord }
+                } else {
+                    nightBpRecord = {
+                        ...{
+                            name: '睡前血压测量',
+                            recomendTime: '20:00-24:00'
+                        },
+                        ...nightBpRecord
+                    }
+                }
                 this.setState({
-                    morningBpRecord: { ...this.state.morningBpRecord, ...morningBpRecord },
+                    morningBpRecord,
                     nightBpRecord: { ...this.state.nightBpRecord, ...nightBpRecord },
                 })
                 callback && callback(data)
@@ -106,7 +137,7 @@ export default class Measure extends React.Component {
                 measureWayModal: false,
                 measureModal: true,
                 measureStep: 1,
-                time: 60,
+                time: 4,
                 measureStatus: 0,
             }, () => {
                 this.timeRun()
@@ -128,7 +159,7 @@ export default class Measure extends React.Component {
         }
         this.setState({
             measureStep: 1,
-            time: 60,
+            time: 4,
             measureStatus: 0
         }, () => {
             this.timeRun()
@@ -175,6 +206,8 @@ export default class Measure extends React.Component {
                 if (!(morningBpRecord.systolicPressure && morningBpRecord.diastolicPressure)) {
                     //晨起血压无数值
                     morningBpRecord = { ...this.state.morningBpRecord, ...morningBpRecord, checkNone: true }
+                }else{
+                    morningBpRecord = { ...this.state.morningBpRecord, ...morningBpRecord,checkNone: false }
                 }
                 this.setState({
                     morningBpRecord
@@ -183,6 +216,8 @@ export default class Measure extends React.Component {
                 if (!(nightBpRecord.systolicPressure && nightBpRecord.diastolicPressure)) {
                     //睡前血压无数值
                     nightBpRecord = { ...this.state.nightBpRecord, ...nightBpRecord, checkNone: true }
+                }else{
+                    nightBpRecord = { ...this.state.nightBpRecord, ...nightBpRecord,checkNone: false }
                 }
                 this.setState({
                     nightBpRecord
@@ -238,6 +273,9 @@ export default class Measure extends React.Component {
             planId,
             taskType
         } = this.state
+        this.setState({
+            measureWayModal:false
+        })
         gotoPage(`/pages/home/bloodpressure/edit/index?returnPath=pages/webview/index`)
     }
 
@@ -344,9 +382,6 @@ export default class Measure extends React.Component {
                                 }
                             </>
                         }
-
-
-
                         {
                             !(item.systolicPressure && item.diastolicPressure) || item.status === 4 ? <button className="measure-btn" onClick={this.handleOpenMeasureWay.bind(this, index)}>去测量</button> : null
                         }
